@@ -1,34 +1,70 @@
 // controllers/auth.controller.js
 
 const User = require('../models/user.model');
+const generateUserId = require('../utils/generateUserId'); // Optional: if you want to use your utility
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // --- Register a new user ---
 exports.register = async (req, res) => {
     try {
-        const { fullName, mobileNumber, email, password, role, aadhaarNum,landSize,crops,location} = req.body;
+        // 1. Destructure flat fields from the frontend request (req.body)
+        const { 
+            fullName, 
+            mobileNumber, 
+            email, 
+            password, 
+            role, 
+            aadhaarNum, 
+            landSize,
+            state,    // Received from AuthScreen.tsx
+            district, // Received from AuthScreen.tsx
+            village   // Received from AuthScreen.tsx
+        } = req.body;
 
-        if (!role || !['Farmer', 'Buyer'].includes(role)) {
-            return res.status(400).json({ message: "Invalid role specified." });
-        }
-
+        // 2. Validate user existence
         let user = await User.findOne({ email });
         if (user) {
-            return res.status(400).json({ message: "User already exists." });
+            return res.status(400).json({ message: "User already exists with this email." });
         }
 
-        user = new User({
-            fullName, mobileNumber, email, password, role, aadhaarNum,landSize, crops,location
+        // 3. Construct the user object matching your Schema exactly
+        // This bundles state, district, and village into the 'location' object
+        const userData = {
+            fullName,
+            mobileNumber,
+            email,
+            password,
+            role,
+            location: {
+                state,
+                district,
+                village
+            }
+        };
+
+        // 4. Conditional Logic for Farmer Role
+        // Your model makes these required ONLY for Farmers
+        if (role === 'Farmer') {
+            if (!aadhaarNum || !landSize) {
+                return res.status(400).json({ message: "Aadhaar and Land Size are required for Farmers." });
+            }
+            userData.aadhaarNum = aadhaarNum;
+            userData.landSize = landSize;
+        }
+
+        // 5. Create and Save the user
+        const newUser = new User(userData);
+        await newUser.save();
+        
+        res.status(201).json({ 
+            success: true,
+            message: "User created successfully. You can now login." 
         });
 
-        // The password hashing is now handled by the user.model.js pre-save hook
-        await user.save();
-        
-        res.status(201).json({ message: "User created successfully." });
-
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error("Registration Error:", error);
+        res.status(500).json({ message: "Server error during registration", error: error.message });
     }
 };
 

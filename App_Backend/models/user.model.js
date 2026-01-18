@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
     role: { 
         type: String, 
         required: true,
-        enum: ['Farmer', 'Buyer']
+        enum: ['Farmer', 'Buyer','Admin']
     },
     aadhaarNum: {
         type: String,
@@ -22,15 +22,11 @@ const UserSchema = new mongoose.Schema({
         type: Number,
         required: function () { return this.role === 'Farmer'; }
     },
-    crops: {
-        type: [String],
-        default: []
-    },
     location: {
         state: { type: String, required: true },
         district: { type: String, required: true },
         village: { type: String }
-    }
+    },
 }, { timestamps: true });
 
 // Hash password before saving the user model

@@ -19,7 +19,7 @@ export const products = [
     location: "Maharashtra",
     rating: 4.5,
     price: 1200,
-    image: require("../../assets/images/Logo.png"), // Local image
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141377/Wheat_ygumfw.jpg" // Local image
   },
   {
     id: "2",
@@ -27,55 +27,55 @@ export const products = [
     location: "Punjab",
     rating: 4.2,
     price: 850,
-    image: require("../../assets/images/Logo.png"),
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141375/RiceSeeds_hzo6ud.jpg",
   },
   {
     id: "3",
-    name: "Tractor Rental",
+    name: "Organic Bajra",
     location: "Haryana",
     rating: 4.8,
     price: 2500,
-    image: require("../../assets/images/Logo.png"),
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141371/Bajra_rc9kgv.jpg",
   },
   {
     id: "4",
-    name: "Organic Fertilizer",
+    name: "Organic Onion",
     location: "Uttar Pradesh",
     rating: 4.1,
     price: 500,
-    image: require("../../assets/images/Logo.png"),
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141372/Onion_xbms1y.jpg",
   },
   {
     id: "5",
-    name: "Cotton Seeds",
+    name: "Cotton ",
     location: "Gujarat",
     rating: 4.4,
     price: 950,
-    image: require("../../assets/images/Logo.png"),
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141370/Cotton_qeozsv.jpg",
   },
   {
     id: "6",
-    name: "Organic Wheat",
+    name: "Organic Soybeans",
     location: "Maharashtra",
     rating: 4.5,
     price: 1200,
-    image: require("../../assets/images/Logo.png"), // Local image
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141374/Soybean_gangx1.jpg", // Local image
   },
   {
     id: "7",
-    name: "Organic Wheat",
+    name: "Organic Sugarcane",
     location: "Maharashtra",
     rating: 4.5,
     price: 1200,
-    image: require("../../assets/images/Logo.png"), // Local image
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141374/Sugarcane_me7k0c.jpg", // Local image
   },
   {
     id: "8",
-    name: "Organic Wheat",
+    name: "Organic Tomatos",
     location: "Maharashtra",
     rating: 4.5,
     price: 1200,
-    image: require("../../assets/images/Logo.png"), // Local image
+    image: "https://res.cloudinary.com/dj7hsbfaf/image/upload/v1761141375/Tomato_yszqez.jpg", // Local image
   },
   {
     id: "9",
@@ -83,7 +83,7 @@ export const products = [
     location: "Maharashtra",
     rating: 4.5,
     price: 1200,
-    image: require("../../assets/images/Logo.png"), // Local image
+    image: require("./Logo.png"), // Local image
   },
   {
     id: "10",
@@ -91,6 +91,6 @@ export const products = [
     location: "Maharashtra",
     rating: 4.5,
     price: 1200,
-    image: require("../../assets/images/Logo.png"), // Local image
+    image: require("./Logo.png"), // Local image
   },
 ];

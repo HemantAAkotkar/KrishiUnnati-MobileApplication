@@ -9,9 +9,9 @@ exports.authenticateToken = (req, res, next) => {
 
     if (token == null) return res.sendStatus(401); // Unauthorized
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, users) => {
         if (err) return res.sendStatus(403); // Forbidden (token is invalid)
-        req.user = user;
+        req.user = users;
         next();
     });
 };
