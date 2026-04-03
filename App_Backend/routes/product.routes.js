@@ -1,3 +1,4 @@
+//App_Backend/routes/product.routes.js
 const express = require('express');
 const multer = require('multer');
 // DESTRICTURING: Add 'getAllProducts' and 'getProductById' here

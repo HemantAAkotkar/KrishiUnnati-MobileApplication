@@ -7,52 +7,77 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, useNavigation } from 'expo-router'; // useNavigation ko yahan se import karein
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState,useEffect } from 'react';
 
 // --- CUSTOM DRAWER CONTENT ---
 function CustomDrawerContent(props: any) {
   const router = useRouter();
-  const navigation = useNavigation(); // ✅ Component ke ANDAR call karein
+  const [userName, setUserName] = useState("Loading...");
+
+  useEffect(() => {
+    const getUserData = async () => {
+      const name = await AsyncStorage.getItem('userName');
+      if (name) setUserName(name);
+    };
+    getUserData();
+  }, []);
 
   const handleLogout = async () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            // 1. Storage saaf karein
-            await AsyncStorage.clear();
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              // 1. Wipe EVERYTHING
+              await AsyncStorage.clear();
 
-            // 2. Navigation Reset karein
-            // Expo Router mein simple 'replace' kaafi hota hai agar AsyncStorage clear ho jaye
-            router.replace('/login');
+              // 2. Redirect to login
+              // Use replace to ensure the user can't go 'back' to the dashboard
+              router.replace('/login');
 
-            console.log("Logged out successfully");
-          } catch (error) {
-            console.error("Logout Error:", error);
+              console.log("Session cleared and redirected");
+            } catch (error) {
+              console.error("Logout Error:", error);
+            }
           }
         }
-      }
-    ]);
+      ]
+    );
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <DrawerContentScrollView {...props}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <DrawerContentScrollView {...props} contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Profile Header */}
         <View style={styles.drawerHeader}>
           <Ionicons name="person-circle" size={60} color="#fff" />
           <Text style={styles.userName}>Farmer Portal</Text>
         </View>
 
-        <DrawerItemList {...props} />
-      </DrawerContentScrollView>
+        {/* This renders all your <Drawer.Screen> items */}
+        <View style={{ flex: 1 }}>
+          <DrawerItemList {...props} />
+        </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Ionicons name="log-out-outline" size={22} color="#d9534f" />
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
-    </View>
+        {/* FIXED LOGOUT BUTTON */}
+        <View style={styles.footerContainer}>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="log-out-outline" size={22} color="#d9534f" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+      </DrawerContentScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -100,13 +125,22 @@ export default function DrawerLayout() {
           drawerIcon: ({ color }) => <Ionicons name="settings-outline" size={22} color={color} />,
         }}
       />
+      <Drawer.Screen
+        name="farmer-orders"
+        options={{
+          drawerLabel: 'Sales Ledger', // Global name for all farmers
+          title: 'Blockchain Sales',
+          drawerIcon: ({ color }) => <MaterialCommunityIcons name="clipboard-list-outline" size={22} color={color} />,
+        }}
+      />
     </Drawer>
+
   );
 }
 const styles = StyleSheet.create({
   drawerHeader: {
     backgroundColor: '#1B4332',
-    height: 140,
+    height: 150,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
@@ -117,13 +151,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 5,
   },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  footerContainer: {
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: '#f4f4f4',
-    marginBottom: 20,
+    backgroundColor: '#fff', // Ensures it's not transparent
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    width: '100%', // Makes the whole bottom area clickable
   },
   logoutText: {
     fontSize: 16,

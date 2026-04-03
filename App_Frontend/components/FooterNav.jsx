@@ -18,15 +18,24 @@ const FooterNav = () => {
         <Text style={[styles.footerNavText, { color: COLORS.primary, fontWeight: 'bold' }]}>Categories</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.footerNavItem} onPress={() => router.push('/profile')}>
+      <TouchableOpacity style={styles.footerNavItem} onPress={() => router.push('/(drawer)/FarmerDashboard')}>
         <Feather name="user" size={24} color={COLORS.secondary} />
         <Text style={styles.footerNavText}>Profile</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.footerNavItem} onPress={() => router.push('/marketplace')}>
+      {/* <TouchableOpacity style={styles.footerNavItem} onPress={() => router.push('/marketplace')}>
         <Feather name="shopping-cart" size={24} color={COLORS.secondary} />
         <Text style={styles.footerNavText}>Cart</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      {/* <TouchableOpacity
+        style={styles.footerNavItem}
+        onPress={() => router.push('/category')} // Changed from /marketplace
+      >
+        <Feather name="grid" size={24} color={COLORS.primary} />
+        <Text style={[styles.footerNavText, { color: COLORS.primary, fontWeight: 'bold' }]}>
+          Categories
+        </Text>
+      </TouchableOpacity> */}
     </View>
   );
 };

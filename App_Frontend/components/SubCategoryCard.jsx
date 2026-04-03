@@ -1,24 +1,18 @@
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { COLORS } from '../constants/colors';
-import { styles } from '../styles/categoryStyles';
-
 const SubCategoryCard = ({ item }) => {
   const router = useRouter();
   return (
     <TouchableOpacity
       style={styles.subCategoryCard}
-      onPress={() => router.push({ pathname: '/productList', params: { categoryName: item.name } })}
+      // Navigate to Marketplace and pass the category as a filter
+      onPress={() => router.push({ 
+        pathname: '/marketplace', 
+        params: { filterCategory: item.category } 
+      })}
     >
       <View style={styles.subCategoryCardImagePlaceholder}>
-        <Feather name="box" size={30} color={COLORS.primary} />
+        <Feather name="layers" size={30} color="#2D6A4F" />
       </View>
-      <Text style={styles.subCategoryCardText} numberOfLines={2}>
-        {item.name}
-      </Text>
+      <Text style={styles.subCategoryCardText}>{item.name}</Text>
     </TouchableOpacity>
   );
 };
-
-export default SubCategoryCard;

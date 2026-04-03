@@ -9,11 +9,11 @@ const UserSchema = new mongoose.Schema({
     mobileNumber: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { 
-        type: String, 
-        required: true,
-        enum: ['Farmer', 'Buyer','Admin']
-    },
+    // role: {
+    //     type: String,
+    //     required: true,
+    //     enum: ['Farmer', 'Buyer', ']
+    // },
     aadhaarNum: {
         type: String,
         required: function () { return this.role === 'Farmer'; }
@@ -27,10 +27,19 @@ const UserSchema = new mongoose.Schema({
         district: { type: String, required: true },
         village: { type: String }
     },
+    walletId: { type: String, default: null },
+    blockchainAddress:{type:String, default: null},
+    blockchainPrivateKey: {type: String, default: null},
+    walletBalance: {
+        type: Number,
+        default: 0
+    },
+    // In UserSchema roles, add 'SYSTEM'
+    role: { type: String, enum: ['Farmer', 'Buyer', 'SYSTEM'], required: true }
 }, { timestamps: true });
 
 // Hash password before saving the user model
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }

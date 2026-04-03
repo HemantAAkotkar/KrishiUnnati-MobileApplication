@@ -1,10 +1,7 @@
 // api/authService.js
 import axios from "axios";
-// import { BASE_URL } from '../constants/config';
-// REPLACE THIS with your computer's actual IP address
-// const IP_ADDRESS = "192.168.135.153"; 
-// const BASE_URL = `http://192.168.135.153:5000/api/auth`;
-const BASE_URL = `http://10.189.48.153:5000/api/auth`
+import { API_HEADERS } from "@/constants/config";
+const BASE_URL = `http://10.123.137.153:5000/api/auth`
 
 const API = axios.create({
   baseURL: BASE_URL,
@@ -23,7 +20,9 @@ API.interceptors.request.use(request => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await API.post('/login', credentials);
+    const response = await API.post('/login', credentials,{
+      headers:API_HEADERS
+    });
     return response.data;
   } catch (error) {
     console.error("❌ API ERROR:", error.message);
@@ -32,7 +31,9 @@ export const loginUser = async (credentials) => {
 };
 export const registerUser = async (userData) => {
   try {
-    const response = await API.post("/register", userData);
+    const response = await API.post("/register", userData,{
+      headers: API_HEADERS
+    });
     return response.data;
   } catch (error) {
     // Professional error logging

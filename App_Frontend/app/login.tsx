@@ -1,3 +1,4 @@
+// App_Frontend/app/login.tsx
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from 'react';
 import {
@@ -51,65 +52,98 @@ const AuthScreen = () => {
     setter(cleaned);
   };
 
-const handleAuthentication = async () => {
-  setLoading(true);
-  try {
-    if (isLoginMode) {
-      // --- LOGIN ---
-      const response = await loginUser({ email, password });
-      
-      // LOG for debugging: Ensure response.user contains _id
-      console.log("Full API Response:", response); 
+  const handleAuthentication = async () => {
+    setLoading(true);
+    try {
+      if (isLoginMode) {
+        // --- LOGIN ---
+        const response = await loginUser({ email, password });
 
-      if (response && response.user && response.token) {
-        // Force the user object to have an _id property if it's missing but 'id' exists
-        const userData = {
-          ...response.user,
-          _id: response.user._id || response.user.id 
+        if (response && response.user && response.token) {
+          const userData = {
+            ...response.user,
+            _id: response.user._id || response.user.id
+          };
+
+          // 1. Save Token and User Object
+          await AsyncStorage.setItem("token", response.token);
+          await AsyncStorage.setItem("user", JSON.stringify(userData));
+
+          // 2. CRITICAL: Save the Wallet ID separately for easy access in Blockchain APIs
+          if (userData.walletId) {
+            await AsyncStorage.setItem("walletId", userData.walletId);
+            console.log("✅ Wallet ID Persisted:", userData.walletId);
+          } else {
+            console.warn("⚠️ No Wallet ID found for this user.");
+          }
+
+          Alert.alert("Success", `Welcome ${userData.fullName}`);
+
+          const userRole = userData.role.toLowerCase();
+          if (userRole === "farmer") {
+            router.replace("/(drawer)/FarmerDashboard");
+          } else {
+            router.replace("/marketplace");
+          }
+        } else {
+          throw new Error("Invalid response from server");
+        }
+
+      } else {
+        // --- REGISTER MODE ---
+        
+        // 1. Client-side Validation
+        if (role === 'Farmer' && (!aadhaarNum || !landSize)) {
+          Alert.alert("Missing Information", "Aadhaar Number and Land Size are required for Farmers.");
+          setLoading(false);
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          Alert.alert("Error", "Passwords do not match.");
+          setLoading(false);
+          return;
+        }
+
+        // 2. Prepare the Data Object exactly as the Backend expects it
+        const newUser = {
+          fullName,
+          mobileNumber,
+          email,
+          password,
+          role,
+          aadhaarNum,
+          landSize: Number(landSize) || 0,
+          state,
+          district,
+          village
         };
 
-        // Save to AsyncStorage
-        await AsyncStorage.setItem("token", response.token);
-        await AsyncStorage.setItem("user", JSON.stringify(userData));
+        // 3. Call the API (Make sure registerUser in authService is updated)
+        const response = await registerUser(newUser);
         
-        Alert.alert("Success", `Welcome ${userData.fullName}`);
-
-        const userRole = userData.role.toLowerCase();
-        if (userRole === "farmer") {
-          router.replace("/(drawer)/FarmerDashboard");
-        } else {
-          router.replace("/marketplace");
+        if (response.success) {
+          Alert.alert(
+            "Registration Successful", 
+            "Your account and Blockchain Wallet have been initialized. Please Sign In."
+          );
+          setIsLoginMode(true); // Switch to Login view
         }
-      } else {
-        throw new Error("Invalid response from server");
       }
-
-    } else {
-      // --- REGISTER ---
-      const newUser = {
-        fullName, mobileNumber, email, password,
-        role, aadhaarNum,
-        landSize: Number(landSize) || 0,
-        state, district, village
-      };
-
-      await registerUser(newUser);
-      Alert.alert("Success", "Account created! Please Sign In.");
-      setIsLoginMode(true);
+    } catch (error) {
+      // Enhanced error logging for ngrok debugging
+      const errorMsg = error.response?.data?.message || error.message;
+      console.log("Auth Error Details:", errorMsg);
+      Alert.alert("Authentication Failed", errorMsg);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    const technicalError = error.response ? JSON.stringify(error.response.data) : error.message;
-    console.log("Auth Error:", technicalError);
-    Alert.alert("Auth Error", "Please check your credentials or network."); 
-  } finally {
-    setLoading(false);
-  }
-};
+  };
   // 2. ROLE SELECTOR COMPONENT
   const RoleSelector = () => (
     <View style={styles.roleMenu}>
-      {['Farmer', 'Buyer', 'Admin'].map((r) => (
-        <TouchableOpacity 
+      {['Farmer', 'Buyer'].map((r) => (
+        <TouchableOpacity
           key={r}
           style={[styles.roleOption, role === r && styles.roleOptionActive]}
           onPress={() => setRole(r)}
@@ -125,24 +159,24 @@ const handleAuthentication = async () => {
   const renderSignUpForm = () => (
     <>
       <Text style={styles.formTitle}>Create Account</Text>
-      
+
       <Text style={styles.label}>Register as:</Text>
       <RoleSelector />
 
       <View style={styles.row}>
-        <TextInput 
-          style={[styles.input, styles.halfInput]} 
-          placeholder="Full Name *" 
-          value={fullName} 
-          onChangeText={setFullName} 
+        <TextInput
+          style={[styles.input, styles.halfInput]}
+          placeholder="Full Name *"
+          value={fullName}
+          onChangeText={setFullName}
         />
-        <TextInput 
-          style={[styles.input, styles.halfInput]} 
-          placeholder="Mobile *" 
-          value={mobileNumber} 
-          onChangeText={(txt) => handleNumericInput(txt, setMobileNumber)} 
-          keyboardType="phone-pad" 
-          maxLength={10} 
+        <TextInput
+          style={[styles.input, styles.halfInput]}
+          placeholder="Mobile *"
+          value={mobileNumber}
+          onChangeText={(txt) => handleNumericInput(txt, setMobileNumber)}
+          keyboardType="phone-pad"
+          maxLength={10}
         />
       </View>
 
@@ -153,24 +187,27 @@ const handleAuthentication = async () => {
         <TextInput style={[styles.input, styles.halfInput]} placeholder="Confirm *" value={confirmPassword} onChangeText={setConfirmPassword} secureTextEntry />
       </View>
 
-      <TextInput 
-        style={styles.input} 
-        placeholder="Aadhaar Number (12-digit)" 
-        value={aadhaarNum} 
-        onChangeText={(txt) => handleNumericInput(txt, setAadhaarNum)} 
-        keyboardType="number-pad" 
-        maxLength={12} 
+      
+      {role== "Farmer" &&(
+        <TextInput
+        style={styles.input}
+        placeholder="Aadhaar Number (12-digit)"
+        value={aadhaarNum}
+        onChangeText={(txt) => handleNumericInput(txt, setAadhaarNum)}
+        keyboardType="number-pad"
+        maxLength={12}
       />
-
+      )}
       {role === 'Farmer' && (
-  <TextInput 
-    style={styles.input} 
-    placeholder="Land Size (in Acres) *" 
-    value={landSize} 
-    onChangeText={(txt) => handleNumericInput(txt, setLandSize)} 
-    keyboardType="numeric" 
-  />
-)}
+        
+        <TextInput
+          style={styles.input}
+          placeholder="Land Size (in Acres) *"
+          value={landSize}
+          onChangeText={(txt) => handleNumericInput(txt, setLandSize)}
+          keyboardType="numeric"
+        />
+      )}
 
       <View style={styles.row}>
         <TextInput style={[styles.input, styles.thirdInput]} placeholder="State" value={state} onChangeText={setState} />
@@ -205,7 +242,7 @@ const handleAuthentication = async () => {
                   </TouchableOpacity>
                 </View>
               ) : renderSignUpForm()}
-              
+
               <TouchableOpacity onPress={() => setIsLoginMode(!isLoginMode)} style={styles.toggleContainer}>
                 <Text style={styles.toggleText}>
                   {isLoginMode ? "Don't have an account? " : "Already have an account? "}
