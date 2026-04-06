@@ -1,6 +1,5 @@
 // Just change this ONE variable when your WiFi IP changes
-export const BASE_URL = "http://10.123.137.153:5000";
-// export const BASE_URL = "http://10.199.204.153:5000";
+export const BASE_URL = "http://mobile:5000";
 
 export const API_ROUTES = {
   LOGIN: `${BASE_URL}/api/auth/login`,
@@ -10,7 +9,7 @@ export const API_ROUTES = {
 };
 
 // App_Frontend/config.js
-export const BlockChainURL = "http://10.123.137.153:5005";
+export const BlockChainURL = "http://mobile:5005";
 
 export const API_HEADERS = {
     

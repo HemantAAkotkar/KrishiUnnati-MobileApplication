@@ -1,7 +1,7 @@
 // api/authService.js
 import axios from "axios";
 import { API_HEADERS } from "@/constants/config";
-const BASE_URL = `http://10.123.137.153:5000/api/auth`
+const BASE_URL = `http://mobile:5000/api/auth`
 
 const API = axios.create({
   baseURL: BASE_URL,

@@ -78,5 +78,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT,"0.0.0.0", () => {
   console.log(`🚀 Krishi Unnati Server running on port ${PORT}`);
   console.log(`📡 Local Access: http://localhost:${PORT}`);
-  console.log(`🌐 Network Access: http://10.123.137.153:${PORT}`);
+  console.log(`🌐 Network Access: http://mobile:${PORT}`);
 });

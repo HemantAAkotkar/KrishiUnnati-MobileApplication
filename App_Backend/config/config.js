@@ -1,8 +1,7 @@
 const config = {
     // ⚠️ Use your Laptop IP here instead of 127.0.0.1 so the Mobile App can connect
-    BLOCKCHAIN_SERVICE_URL: 'http://10.123.137.153:5005', 
-    baseBlockchainURL: 'https://constance-exemplifiable-sagaciously.ngrok-free.dev',
-    // baseBlockchainURL= "https://heterogamous-uniocular-rana.ngrok-free.dev"
+    BLOCKCHAIN_SERVICE_URL: 'http://mobile:5005', 
+    baseBlockchainURL: 'https://-sagaciously.ngrok-free.dev',
     
     ENDPOINTS: {
         WALLET_CREATE: '/api/v1/pay-system-kup/wallet/create',
